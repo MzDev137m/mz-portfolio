@@ -137,17 +137,6 @@ export default function Splash() {
               </p>
             </div>
           </div>
-
-          {/* MZ Corporations credit */}
-          <motion.p
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 font-mono text-[8px] tracking-[.25em] uppercase whitespace-nowrap"
-            style={{ color: 'rgba(99,102,241,.22)' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 1 }}
-          >
-            Developed by MZ Corporations
-          </motion.p>
         </motion.div>
       )}
     </AnimatePresence>
