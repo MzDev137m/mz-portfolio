@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 
 const facts = [
@@ -9,6 +10,35 @@ const facts = [
   { icon: '💼', label: 'Experience',       value: '5+ Years Professional' },
   { icon: '🚀', label: 'Focus',            value: 'Full-Stack & Performance' },
 ]
+
+function ProfileAvatar({ size = 68 }) {
+  const [imgOk, setImgOk] = useState(true)
+  return (
+    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      {/* Animated gradient ring */}
+      <div className="absolute inset-0 rounded-full border-spin" style={{ padding: 2 }} />
+      {/* Outer glow */}
+      <div className="absolute inset-0 rounded-full pointer-events-none"
+        style={{ boxShadow: '0 0 22px rgba(99,102,241,.5), 0 0 44px rgba(6,182,212,.2)' }} />
+      {/* Photo or initials */}
+      <div className="absolute inset-[3px] rounded-full overflow-hidden"
+        style={{ background: 'rgba(10,10,30,.95)' }}>
+        {imgOk ? (
+          <img
+            src="/profile.jpg"
+            alt="Muzammal Tariq"
+            className="w-full h-full object-cover"
+            onError={() => setImgOk(false)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="font-orb text-xl font-bold text-grad">MT</span>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 const v = (delay = 0) => ({
   initial: { opacity: 0, y: 30 },
@@ -71,12 +101,11 @@ export default function About() {
                 style={{ background: 'radial-gradient(circle, rgba(99,102,241,.12) 0%, transparent 70%)', transform: 'translate(30%,-30%)' }} />
 
               <div className="flex items-center gap-5 mb-6">
-                <div className="w-16 h-16 rounded-2xl glass flex items-center justify-center glow-indigo">
-                  <span className="font-orb text-xl font-bold text-grad">MT</span>
-                </div>
+                <ProfileAvatar />
                 <div>
                   <div className="font-serif font-bold text-cream text-xl">Muzammal Tariq</div>
                   <div className="font-mono text-[10px] tracking-[.2em] uppercase text-indigo/60 mt-1">ERP Engineer & Web Developer</div>
+                  <div className="font-mono text-[9px] tracking-[.15em] uppercase mt-1" style={{ color: 'rgba(245,158,11,.55)' }}>MZ Corporations</div>
                 </div>
               </div>
 

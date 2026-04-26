@@ -1,6 +1,7 @@
 import { DM_Sans, Syne, Space_Mono, Orbitron } from 'next/font/google'
 import './globals.css'
 import SmoothScroll from '@/components/ui/SmoothScroll'
+import CustomCursor from '@/components/ui/CustomCursor'
 
 const dmSans    = DM_Sans({ subsets: ['latin'], weight: ['300','400','500','600'], variable: '--font-dm-sans', display: 'swap' })
 const syne      = Syne({ subsets: ['latin'], weight: ['400','500','600','700','800'], variable: '--font-syne', display: 'swap' })
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${syne.variable} ${spaceMono.variable} ${orbitron.variable}`}>
       <body className="bg-dark text-cream antialiased overflow-x-hidden">
+        <CustomCursor />
         <SmoothScroll>
           {children}
         </SmoothScroll>

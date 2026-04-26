@@ -137,6 +137,21 @@ export default function Splash() {
               </p>
             </div>
           </div>
+
+          {/* Developer credit */}
+          <motion.div
+            className="absolute bottom-7 left-0 right-0 flex items-center justify-center gap-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.4 }}
+          >
+            <div className="h-[1px] w-8" style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,.4))' }} />
+            <span className="font-mono text-[9px] tracking-[.35em] uppercase"
+              style={{ color: 'rgba(245,158,11,.55)' }}>
+              Developed by MZ Corporations
+            </span>
+            <div className="h-[1px] w-8" style={{ background: 'linear-gradient(90deg, rgba(245,158,11,.4), transparent)' }} />
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
