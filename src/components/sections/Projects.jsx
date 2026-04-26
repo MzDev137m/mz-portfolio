@@ -1,6 +1,8 @@
 'use client'
 import { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
+import * as Dialog from '@radix-ui/react-dialog'
+import { ExternalLink, X, CheckCircle2 } from 'lucide-react'
 
 const projects = [
   {
@@ -71,16 +73,127 @@ const projects = [
 
 const statusColor = { Production: '#10b981', Ongoing: '#f59e0b', Development: '#6366f1' }
 
-function ProjectCard({ p, i, active, setActive }) {
+// ─── Project Detail Dialog ─────────────────────────────────────────
+
+function ProjectDialog({ p, open, onClose }) {
+  return (
+    <Dialog.Root open={open} onOpenChange={v => !v && onClose()}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="radix-dialog-overlay" />
+        <Dialog.Content className="radix-dialog-content">
+
+          {/* Close button */}
+          <Dialog.Close asChild>
+            <button className="absolute top-5 right-5 w-9 h-9 rounded-full glass flex items-center justify-center transition-all duration-200 hover:scale-110 hover:bg-white/10 z-10"
+              style={{ border: '1px solid rgba(255,255,255,.12)' }}>
+              <X size={15} className="text-slate/70" />
+            </button>
+          </Dialog.Close>
+
+          {/* Glowing top bar */}
+          <div className="h-[2px] w-full rounded-t-2xl"
+            style={{ background: `linear-gradient(90deg, ${p.color}55, ${p.color}, ${p.color}55)` }} />
+
+          <div className="p-7 sm:p-9 overflow-y-auto max-h-[80vh]">
+            {/* Header */}
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                style={{ background: `${p.color}14`, border: `1px solid ${p.color}30` }}>
+                {p.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="font-mono text-[9px] tracking-[.25em] uppercase" style={{ color: `${p.color}99` }}>
+                    {p.label} · {p.year}
+                  </span>
+                  <span className="font-mono text-[9px] px-2 py-0.5 rounded-full flex items-center gap-1.5"
+                    style={{ background: `${statusColor[p.status]}12`, color: statusColor[p.status], border: `1px solid ${statusColor[p.status]}25` }}>
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: statusColor[p.status] }} />
+                    {p.status}
+                  </span>
+                </div>
+                <Dialog.Title className="font-serif font-bold text-cream text-xl leading-tight">{p.name}</Dialog.Title>
+              </div>
+            </div>
+
+            {/* Description */}
+            <Dialog.Description className="font-sans text-slate/70 text-[14px] leading-relaxed mb-6">
+              {p.desc}
+            </Dialog.Description>
+
+            {/* Metrics */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {p.metrics.map(m => (
+                <div key={m.label} className="text-center py-3 rounded-xl"
+                  style={{ background: `${p.color}09`, border: `1px solid ${p.color}18` }}>
+                  <div className="font-orb text-lg font-bold" style={{ color: p.color }}>{m.value}</div>
+                  <div className="font-mono text-[9px] text-slate/45 mt-1">{m.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Features */}
+            <div className="mb-6">
+              <div className="font-mono text-[10px] tracking-[.3em] uppercase mb-3" style={{ color: p.color }}>
+                Key Features
+              </div>
+              <ul className="flex flex-col gap-2.5">
+                {p.features.map((f, i) => (
+                  <motion.li key={f} className="flex items-center gap-3"
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.07, duration: 0.4 }}>
+                    <CheckCircle2 size={14} style={{ color: p.color, flexShrink: 0 }} />
+                    <span className="font-sans text-[13px] text-slate/75">{f}</span>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Tech stack */}
+            <div className="mb-6">
+              <div className="font-mono text-[10px] tracking-[.3em] uppercase mb-3 text-slate/50">
+                Technology Stack
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {p.tech.map(t => (
+                  <span key={t} className="font-mono text-[10px] px-3 py-1 rounded-full"
+                    style={{ background: `${p.color}12`, color: `${p.color}cc`, border: `1px solid ${p.color}25` }}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Live link */}
+            {p.liveUrl && (
+              <a href={p.liveUrl} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 font-sans text-[12px] tracking-[.2em] uppercase px-6 py-3 rounded-full transition-all duration-300 hover:scale-105"
+                style={{ background: `linear-gradient(135deg, ${p.color}20, ${p.color}10)`, color: p.color, border: `1px solid ${p.color}35`, boxShadow: `0 4px 20px ${p.color}20` }}>
+                <ExternalLink size={13} />
+                View Live Project
+              </a>
+            )}
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  )
+}
+
+// ─── Project Card ──────────────────────────────────────────────────
+
+function ProjectCard({ p, i, onOpenDialog }) {
   const wrapRef = useRef(null)
-  const rx = useMotionValue(0)
-  const ry = useMotionValue(0)
+  const rx  = useMotionValue(0)
+  const ry  = useMotionValue(0)
   const srx = useSpring(rx, { stiffness: 180, damping: 20 })
   const sry = useSpring(ry, { stiffness: 180, damping: 20 })
+  const [expanded, setExpanded] = useState(false)
 
   const onMove = useCallback((e) => {
     if (!wrapRef.current) return
-    const r = wrapRef.current.getBoundingClientRect()
+    const r  = wrapRef.current.getBoundingClientRect()
     const cx = (e.clientX - r.left) / r.width
     const cy = (e.clientY - r.top)  / r.height
     rx.set((cy - 0.5) * -10)
@@ -98,37 +211,27 @@ function ProjectCard({ p, i, active, setActive }) {
       initial={{ opacity: 0, y: 44 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.65, delay: (i % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
-    >
+      transition={{ duration: 0.65, delay: (i % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}>
       <motion.div
         style={{ rotateX: srx, rotateY: sry, transformStyle: 'preserve-3d' }}
-        className="product-card glass rounded-2xl overflow-hidden cursor-pointer group relative"
-        whileHover={{ scale: 1.015 }}
-        onClick={() => setActive(active === p.id ? null : p.id)}
-      >
-        {/* Glowing top border */}
-        <motion.div
-          className="h-[2px] w-full"
-          style={{ background: `linear-gradient(90deg, ${p.color}44, ${p.color}, ${p.color}44)` }}
-          animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-        />
+        className="product-card glass rounded-2xl overflow-hidden group relative"
+        whileHover={{ scale: 1.015 }}>
 
-        {/* Light glint sweep */}
+        {/* Top color bar */}
+        <div className="h-[2px] w-full"
+          style={{ background: `linear-gradient(90deg, ${p.color}44, ${p.color}, ${p.color}44)` }} />
+
         <div className="card-glint" />
-
-        {/* Product number */}
         <span className="card-num">{String(i + 1).padStart(2, '0')}</span>
 
-        {/* Hover glow from top */}
+        {/* Hover glow */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
           style={{ background: `radial-gradient(ellipse 80% 50% at 50% 0%, ${p.color}12 0%, transparent 65%)` }} />
 
         <div className="p-6 relative z-10">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <motion.div
-                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+              <motion.div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
                 style={{ background: `${p.color}12`, border: `1px solid ${p.color}28` }}
                 whileHover={{ scale: 1.15, rotate: [0, -6, 6, 0] }}
                 transition={{ duration: 0.4 }}>
@@ -148,9 +251,9 @@ function ProjectCard({ p, i, active, setActive }) {
             </span>
           </div>
 
-          <p className="font-sans text-[13px] text-slate/65 leading-relaxed mb-4">{p.desc}</p>
+          <p className="font-sans text-[13px] text-slate/65 leading-relaxed mb-4 line-clamp-2">{p.desc}</p>
 
-          {/* Metrics — product-style */}
+          {/* Metrics */}
           <div className="grid grid-cols-3 gap-2 mb-4 pb-4 border-b border-white/5">
             {p.metrics.map(m => (
               <div key={m.label} className="text-center py-2 rounded-lg"
@@ -161,7 +264,8 @@ function ProjectCard({ p, i, active, setActive }) {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-1.5">
+          {/* Tech tags */}
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {p.tech.map(t => (
               <span key={t} className="font-mono text-[9px] px-2 py-0.5 rounded-full"
                 style={{ background: `${p.color}10`, color: `${p.color}bb`, border: `1px solid ${p.color}20` }}>
@@ -169,72 +273,46 @@ function ProjectCard({ p, i, active, setActive }) {
               </span>
             ))}
           </div>
-        </div>
 
-        {/* Expandable features */}
-        <AnimatePresence>
-          {active === p.id && (
-            <motion.div
-              className="px-6 pb-6 relative z-10"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.38 }}>
-              <div className="border-t border-white/5 pt-4">
-                <div className="font-mono text-[10px] tracking-[.3em] uppercase mb-3" style={{ color: p.color }}>
-                  Key Features
-                </div>
-                <ul className="flex flex-col gap-2">
-                  {p.features.map((f, fi) => (
-                    <motion.li key={f}
-                      className="flex items-start gap-2"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: fi * 0.06 }}>
-                      <span className="mt-1.5 w-1 h-1 rounded-full flex-shrink-0" style={{ background: p.color }} />
-                      <span className="font-sans text-[12px] text-slate/70">{f}</span>
-                    </motion.li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {p.liveUrl && (
-          <div className="px-6 pb-4 z-10 relative">
-            <a href={p.liveUrl} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[.2em] uppercase px-4 py-1.5 rounded-full transition-all duration-200 hover:scale-105"
-              style={{ background: `${p.color}12`, color: p.color, border: `1px solid ${p.color}30` }}
-              onClick={e => e.stopPropagation()}>
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: p.color }} />
-              View Live
-            </a>
+          {/* Action row */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onOpenDialog(p)}
+              className="font-mono text-[9px] tracking-[.2em] uppercase px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105"
+              style={{ background: `${p.color}14`, color: p.color, border: `1px solid ${p.color}28` }}>
+              View Details
+            </button>
+            {p.liveUrl && (
+              <a href={p.liveUrl} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 font-mono text-[9px] tracking-[.2em] uppercase px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105"
+                style={{ background: 'rgba(52,211,153,.1)', color: '#34d399', border: '1px solid rgba(52,211,153,.25)' }}>
+                <ExternalLink size={9} />
+                Live
+              </a>
+            )}
           </div>
-        )}
-        <div className="absolute bottom-3 right-4 font-mono text-[10px] text-slate/25 z-10">
-          {active === p.id ? '▲ less' : '▼ more'}
         </div>
       </motion.div>
     </motion.div>
   )
 }
 
+// ─── Section ───────────────────────────────────────────────────────
+
 export default function Projects() {
-  const [active, setActive] = useState(null)
+  const [dialogProject, setDialogProject] = useState(null)
 
   return (
     <section id="projects" className="section-pad relative overflow-hidden"
       style={{ background: 'linear-gradient(180deg, #050510 0%, #080820 50%, #050510 100%)' }}>
 
-      {/* Ambient */}
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(99,102,241,.04) 0%, transparent 70%)' }} />
       <div className="bokeh-orb absolute" style={{ width: 280, height: 280, top: '5%', left: '8%', background: 'rgba(99,102,241,.06)', '--bdur': '11s', '--bdelay': '1s' }} />
       <div className="bokeh-orb absolute" style={{ width: 220, height: 220, bottom: '8%', right: '6%', background: 'rgba(6,182,212,.05)', '--bdur': '13s', '--bdelay': '4s' }} />
 
       <div className="max-w-7xl mx-auto">
-
+        {/* Heading */}
         <div className="text-center mb-16">
           <motion.p className="font-mono text-[11px] tracking-[.5em] uppercase text-cyan/60 mb-3"
             initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
@@ -244,24 +322,34 @@ export default function Projects() {
             style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.1 }}>
-            Featured <span className="text-grad">Work</span>
+            Shipped <span className="text-grad">Production Systems</span>
           </motion.h2>
-          <motion.div
-            className="divider-grad w-40 mx-auto mb-4"
+          <motion.div className="divider-grad w-40 mx-auto mb-4"
             initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }}
             viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }} />
-          <motion.p className="font-sans text-slate/60 text-sm"
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.25 }}>
-            ERP systems, web applications &amp; platforms built from the ground up — click any card for details
+          <motion.p className="font-sans text-slate/60 text-sm max-w-md mx-auto"
+            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+            viewport={{ once: true }} transition={{ delay: 0.25 }}>
+            Enterprise ERP systems, web platforms, and automation engines — click a card for full details
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((p, i) => (
-            <ProjectCard key={p.id} p={p} i={i} active={active} setActive={setActive} />
+            <ProjectCard key={p.id} p={p} i={i} onOpenDialog={setDialogProject} />
           ))}
         </div>
       </div>
+
+      {/* Dialog */}
+      {dialogProject && (
+        <ProjectDialog
+          p={dialogProject}
+          open={!!dialogProject}
+          onClose={() => setDialogProject(null)}
+        />
+      )}
     </section>
   )
 }

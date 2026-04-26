@@ -1,7 +1,7 @@
 'use client'
 import { useRef, useCallback } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
-// useMotionValue kept for rx/ry tilt values
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 const skills = [
   {
@@ -70,14 +70,14 @@ const badgeColor = { Expert: '#6366f1', Advanced: '#06b6d4', Proficient: '#f59e0
 
 function SkillCard({ s, i }) {
   const wrapRef = useRef(null)
-  const rx = useMotionValue(0)
-  const ry = useMotionValue(0)
+  const rx  = useMotionValue(0)
+  const ry  = useMotionValue(0)
   const srx = useSpring(rx, { stiffness: 220, damping: 22 })
   const sry = useSpring(ry, { stiffness: 220, damping: 22 })
 
   const onMove = useCallback((e) => {
     if (!wrapRef.current) return
-    const r = wrapRef.current.getBoundingClientRect()
+    const r  = wrapRef.current.getBoundingClientRect()
     const cx = (e.clientX - r.left) / r.width
     const cy = (e.clientY - r.top)  / r.height
     rx.set((cy - 0.5) * -16)
@@ -95,39 +95,44 @@ function SkillCard({ s, i }) {
       initial={{ opacity: 0, y: 44 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.65, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
-    >
+      transition={{ duration: 0.65, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}>
       <motion.div
         style={{ rotateX: srx, rotateY: sry, transformStyle: 'preserve-3d', border: `1px solid ${s.color}18` }}
         className="product-card glass rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden cursor-default group h-full"
         whileHover={{ scale: 1.02 }}
-        transition={{ duration: 0.25 }}
-      >
-        {/* Static top glow on hover */}
+        transition={{ duration: 0.25 }}>
+
+        {/* Hover top glow */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
           style={{ background: `radial-gradient(ellipse 80% 55% at 50% 0%, ${s.color}14 0%, transparent 65%)` }} />
-
-        {/* Light glint sweep */}
         <div className="card-glint" />
-
-        {/* Product number */}
         <span className="card-num">{String(i + 1).padStart(2, '0')}</span>
 
-        {/* Top row */}
+        {/* Top row: icon + badge with Tooltip */}
         <div className="flex items-center justify-between relative z-10">
-          <motion.span
-            className="text-3xl"
+          <motion.span className="text-3xl"
             whileHover={{ scale: 1.2, rotate: [0, -8, 8, 0] }}
             transition={{ duration: 0.4 }}>
             {s.icon}
           </motion.span>
-          <span className="font-mono text-[9px] tracking-[.25em] uppercase px-2.5 py-1 rounded-full"
-            style={{ background: `${badgeColor[s.badge]}15`, color: badgeColor[s.badge], border: `1px solid ${badgeColor[s.badge]}30` }}>
-            {s.badge}
-          </span>
+
+          <Tooltip.Root delayDuration={200}>
+            <Tooltip.Trigger asChild>
+              <span className="font-mono text-[9px] tracking-[.25em] uppercase px-2.5 py-1 rounded-full cursor-default"
+                style={{ background: `${badgeColor[s.badge]}15`, color: badgeColor[s.badge], border: `1px solid ${badgeColor[s.badge]}30` }}>
+                {s.badge}
+              </span>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content className="radix-tooltip-content" sideOffset={6}>
+                <p className="font-sans text-[11px] text-slate/80 leading-relaxed max-w-[220px]">{s.desc}</p>
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
         </div>
 
-        {/* Name + bar */}
+        {/* Name + progress bar */}
         <div className="relative z-10">
           <h3 className="font-serif font-semibold text-cream text-lg leading-tight">{s.name}</h3>
           <div className="mt-2 h-[3px] bg-white/5 rounded-full overflow-hidden">
@@ -163,51 +168,46 @@ function SkillCard({ s, i }) {
 
 export default function Skills() {
   return (
-    <section id="skills" className="section-pad relative overflow-hidden" style={{ background: '#050510' }}>
+    <Tooltip.Provider>
+      <section id="skills" className="section-pad relative overflow-hidden" style={{ background: '#050510' }}>
 
-      {/* Grid bg */}
-      <div className="absolute inset-0 opacity-[.022] pointer-events-none"
-        style={{ backgroundImage: 'linear-gradient(rgba(99,102,241,1) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+        {/* Grid bg */}
+        <div className="absolute inset-0 opacity-[.022] pointer-events-none"
+          style={{ backgroundImage: 'linear-gradient(rgba(99,102,241,1) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,1) 1px,transparent 1px)', backgroundSize: '60px 60px' }} />
 
-      {/* Ambient orbs */}
-      <div className="bokeh-orb absolute" style={{ width: 300, height: 300, top: '10%', right: '5%', background: 'rgba(99,102,241,.05)', '--bdur': '12s', '--bdelay': '0s' }} />
-      <div className="bokeh-orb absolute" style={{ width: 200, height: 200, bottom: '10%', left: '3%', background: 'rgba(6,182,212,.04)', '--bdur': '9s', '--bdelay': '3s' }} />
+        {/* Bokeh orbs */}
+        <div className="bokeh-orb absolute" style={{ width: 300, height: 300, top: '10%', right: '5%', background: 'rgba(99,102,241,.05)', '--bdur': '12s', '--bdelay': '0s' }} />
+        <div className="bokeh-orb absolute" style={{ width: 200, height: 200, bottom: '10%', left: '3%', background: 'rgba(6,182,212,.04)', '--bdur': '9s', '--bdelay': '3s' }} />
 
-      <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto">
+          {/* Heading */}
+          <div className="text-center mb-16">
+            <motion.p className="font-mono text-[11px] tracking-[.5em] uppercase text-cyan/60 mb-3"
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+              &lt;skills /&gt;
+            </motion.p>
+            <motion.h2 className="font-serif font-bold text-cream mb-3"
+              style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}
+              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.1 }}>
+              Technical <span className="text-grad">Arsenal</span>
+            </motion.h2>
+            <motion.div className="divider-grad w-40 mx-auto mb-4"
+              initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }} />
+            <motion.p className="font-sans text-slate/60 text-sm max-w-md mx-auto"
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+              viewport={{ once: true }} transition={{ delay: 0.25 }}>
+              Enterprise-grade tools — hover the badge to read skill details
+            </motion.p>
+          </div>
 
-        {/* Heading */}
-        <div className="text-center mb-16">
-          <motion.p
-            className="font-mono text-[11px] tracking-[.5em] uppercase text-cyan/60 mb-3"
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-            &lt;skills /&gt;
-          </motion.p>
-          <motion.h2
-            className="font-serif font-bold text-cream mb-3"
-            style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.1 }}>
-            Technical <span className="text-grad">Arsenal</span>
-          </motion.h2>
-          <motion.div
-            className="divider-grad w-40 mx-auto mb-4"
-            initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }} />
-          <motion.p
-            className="font-sans text-slate/60 text-sm max-w-md mx-auto"
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-            viewport={{ once: true }} transition={{ delay: 0.25 }}>
-            Enterprise-grade tools for backend systems and modern web applications
-          </motion.p>
+          {/* Skill cards grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {skills.map((s, i) => <SkillCard key={s.name} s={s} i={i} />)}
+          </div>
         </div>
-
-        {/* 3D tilt skill cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {skills.map((s, i) => (
-            <SkillCard key={s.name} s={s} i={i} />
-          ))}
-        </div>
-      </div>
-    </section>
+      </section>
+    </Tooltip.Provider>
   )
 }
