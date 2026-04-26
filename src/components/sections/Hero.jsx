@@ -229,7 +229,7 @@ function ProfileVisual() {
         <div className="absolute inset-[3px] rounded-full overflow-hidden"
           style={{ background: '#060618' }}>
           {imgOk ? (
-            <img src="/profile.jpg" alt="Muzammal Tariq"
+            <img src="https://github.com/MzDev137m.png" alt="Muzammal Tariq"
               className="w-full h-full object-cover"
               onError={() => setImgOk(false)} />
           ) : (
