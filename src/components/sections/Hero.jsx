@@ -19,6 +19,7 @@ const STATS = [
 ]
 const FIRST = 'Muzammal'
 const LAST  = 'Tariq'
+
 const TECH_FLOAT = [
   { text: '⚛ React',      color: '#61dafb', cls: 'left-[1%] top-[20%]', dur: 3.8, delay: 4.9 },
   { text: '▲ Next.js',    color: '#e2e8f0', cls: 'right-[1%] top-[17%]', dur: 4.2, delay: 5.1 },
@@ -28,7 +29,22 @@ const TECH_FLOAT = [
   { text: '🟨 TypeScript', color: '#f59e0b', cls: 'right-[3%] top-[77%]', dur: 4.0, delay: 5.9 },
 ]
 
-/* ── Scramble text effect ── */
+// Static bokeh data — no Math.random() to avoid hydration mismatch
+const BOKEH = [
+  { w:220, h:220, top:'12%',  left:'6%',   bg:'rgba(99,102,241,.09)',  dur:'9s',  delay:'0s'   },
+  { w:160, h:160, top:'55%',  right:'5%',  bg:'rgba(6,182,212,.07)',   dur:'11s', delay:'2.5s' },
+  { w:110, h:110, top:'38%',  left:'2%',   bg:'rgba(245,158,11,.06)',  dur:'7s',  delay:'1s'   },
+  { w:140, h:140, bottom:'20%',right:'10%',bg:'rgba(139,92,246,.07)',  dur:'10s', delay:'3s'   },
+  { w:90,  h:90,  top:'75%',  left:'18%',  bg:'rgba(6,182,212,.05)',   dur:'8s',  delay:'1.8s' },
+]
+
+// Static laser data
+const LASERS = [
+  { top: '27%', color: 'rgba(99,102,241,.6), rgba(6,182,212,.4)',  dur: '10s', delay: '0.5s'  },
+  { top: '68%', color: 'rgba(6,182,212,.45), rgba(139,92,246,.35)', dur: '13s', delay: '4s'   },
+  { top: '47%', color: 'rgba(245,158,11,.35), rgba(99,102,241,.3)', dur: '16s', delay: '8s'   },
+]
+
 function ScrambleRole({ text }) {
   const [display, setDisplay] = useState(text)
   const prev = useRef(text)
@@ -50,7 +66,6 @@ function ScrambleRole({ text }) {
   return <>{display}</>
 }
 
-/* ── Counter animation ── */
 function Counter({ to, suffix, startDelay }) {
   const [val, setVal] = useState(0)
   useEffect(() => {
@@ -65,7 +80,6 @@ function Counter({ to, suffix, startDelay }) {
   return <span>{val}{suffix}</span>
 }
 
-/* ── Magnetic CTA button ── */
 function MagBtn({ children, primary, onClick }) {
   const ref = useRef(null)
   const x = useMotionValue(0), y = useMotionValue(0)
@@ -82,15 +96,17 @@ function MagBtn({ children, primary, onClick }) {
     <motion.button ref={ref}
       style={{ x: sx, y: sy }}
       onMouseMove={onMove} onMouseLeave={onLeave} onClick={onClick}
-      whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
+      whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.95 }}
       className={primary
-        ? 'relative font-sans text-[12px] tracking-[.25em] uppercase px-11 py-4 rounded-full font-medium text-white overflow-hidden shadow-lg shadow-indigo/40 hover:shadow-indigo/70 transition-shadow duration-300'
+        ? 'relative font-sans text-[12px] tracking-[.25em] uppercase px-11 py-4 rounded-full font-medium text-white overflow-hidden'
         : 'font-sans text-[12px] tracking-[.25em] uppercase px-11 py-4 rounded-full border border-indigo/30 text-indigo hover:border-indigo/70 hover:bg-indigo/10 transition-all duration-300'
       }>
-      {primary && (
+      {primary && <>
         <span className="absolute inset-0 rounded-full"
           style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)' }} />
-      )}
+        <span className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
+          style={{ boxShadow: '0 0 30px rgba(99,102,241,.6), 0 0 60px rgba(6,182,212,.3)' }} />
+      </>}
       <span className="relative z-10">{children}</span>
     </motion.button>
   )
@@ -119,7 +135,6 @@ export default function Hero() {
   const smX = useSpring(mouseX, { stiffness: 25, damping: 20 })
   const smY = useSpring(mouseY, { stiffness: 25, damping: 20 })
 
-  /* Parallax blob transforms */
   const b1x = useTransform(smX, [0, 1], ['-80px', '80px'])
   const b1y = useTransform(smY, [0, 1], ['-50px', '50px'])
   const b2x = useTransform(smX, [0, 1], ['90px', '-90px'])
@@ -127,16 +142,14 @@ export default function Hero() {
   const b3x = useTransform(smX, [0, 1], ['-50px', '50px'])
   const b3y = useTransform(smY, [0, 1], ['45px', '-45px'])
 
-  /* 3D title tilt */
   const rotY = useTransform(smX, [0, 1], [-6, 6])
   const rotX = useTransform(smY, [0, 1], [4, -4])
 
-  /* Mouse tracking */
   useEffect(() => {
     const onMove = (e) => {
       if (cursorGlowRef.current) {
         cursorGlowRef.current.style.background =
-          `radial-gradient(400px circle at ${e.clientX}px ${e.clientY}px, rgba(99,102,241,.07) 0%, transparent 70%)`
+          `radial-gradient(500px circle at ${e.clientX}px ${e.clientY}px, rgba(99,102,241,.09) 0%, transparent 70%)`
       }
       mouseX.set(e.clientX / window.innerWidth)
       mouseY.set(e.clientY / window.innerHeight)
@@ -145,13 +158,11 @@ export default function Hero() {
     return () => window.removeEventListener('mousemove', onMove)
   }, [mouseX, mouseY])
 
-  /* Role cycling */
   useEffect(() => {
     const id = setInterval(() => setRoleIdx(i => (i + 1) % ROLES.length), 3200)
     return () => clearInterval(id)
   }, [])
 
-  /* Canvas particles */
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -197,45 +208,70 @@ export default function Hero() {
   return (
     <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden noise">
 
-      {/* Gradient base layers */}
+      {/* Gradient base */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 90% 70% at 50% -10%, rgba(99,102,241,.3) 0%, transparent 65%)' }} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 90% 70% at 50% -10%, rgba(99,102,241,.32) 0%, transparent 65%)' }} />
         <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 55% 40% at 88% 88%, rgba(6,182,212,.1) 0%, transparent 60%)' }} />
         <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 40% 35% at 6% 60%, rgba(245,158,11,.07) 0%, transparent 60%)' }} />
+        {/* Center cinematic spotlight */}
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 40%, rgba(99,102,241,.07) 0%, transparent 70%)' }} />
       </div>
 
-      {/* Cursor glow — DOM-manipulated directly to avoid re-renders */}
-      <div ref={cursorGlowRef} className="absolute inset-0 pointer-events-none" style={{ transition: 'none' }} />
+      {/* Bokeh depth orbs */}
+      {BOKEH.map((b, i) => (
+        <div key={i} className="bokeh-orb" style={{
+          width: b.w, height: b.h,
+          top: b.top, left: b.left, right: b.right, bottom: b.bottom,
+          background: b.bg,
+          '--bdur': b.dur, '--bdelay': b.delay, '--bop': 0.7,
+          zIndex: 0,
+        }} />
+      ))}
+
+      {/* Laser scan lines */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
+        {LASERS.map((l, i) => (
+          <div key={i} className="laser-h" style={{
+            top: l.top,
+            background: `linear-gradient(90deg, transparent, ${l.color}, transparent)`,
+            boxShadow: `0 0 12px rgba(99,102,241,.3), 0 0 24px rgba(6,182,212,.15)`,
+            '--ldur': l.dur, '--ldelay': l.delay,
+          }} />
+        ))}
+      </div>
+
+      {/* Cursor glow */}
+      <div ref={cursorGlowRef} className="absolute inset-0 pointer-events-none" style={{ transition: 'none', zIndex: 1 }} />
 
       {/* Canvas particle field */}
-      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />
+      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }} />
 
       {/* Mouse-parallax blobs */}
       <motion.div className="absolute w-[800px] h-[800px] rounded-full pointer-events-none blob"
-        style={{ background: 'radial-gradient(circle, rgba(99,102,241,.1) 0%, transparent 70%)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%', x: b1x, y: b1y, opacity: 0.7 }} />
+        style={{ background: 'radial-gradient(circle, rgba(99,102,241,.1) 0%, transparent 70%)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%', x: b1x, y: b1y, opacity: 0.7, zIndex: 0 }} />
       <motion.div className="absolute w-[520px] h-[520px] rounded-full pointer-events-none hidden md:block"
-        style={{ background: 'radial-gradient(circle, rgba(6,182,212,.07) 0%, transparent 70%)', top: '22%', right: '4%', x: b2x, y: b2y }}
+        style={{ background: 'radial-gradient(circle, rgba(6,182,212,.07) 0%, transparent 70%)', top: '22%', right: '4%', x: b2x, y: b2y, zIndex: 0 }}
         animate={{ scale: [1, 1.14, 1] }} transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }} />
       <motion.div className="absolute w-[360px] h-[360px] rounded-full pointer-events-none hidden md:block"
-        style={{ background: 'radial-gradient(circle, rgba(245,158,11,.06) 0%, transparent 70%)', bottom: '12%', left: '4%', x: b3x, y: b3y }}
+        style={{ background: 'radial-gradient(circle, rgba(245,158,11,.06) 0%, transparent 70%)', bottom: '12%', left: '4%', x: b3x, y: b3y, zIndex: 0 }}
         animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }} />
 
       {/* Rotating orbital rings */}
       <motion.div className="absolute w-[820px] h-[820px] rounded-full pointer-events-none"
-        style={{ border: '1px solid rgba(99,102,241,.07)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+        style={{ border: '1px solid rgba(99,102,241,.07)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%', zIndex: 1 }}
         animate={{ rotate: 360 }} transition={{ duration: 55, repeat: Infinity, ease: 'linear' }} />
       <motion.div className="absolute w-[580px] h-[580px] rounded-full pointer-events-none"
-        style={{ border: '1px solid rgba(6,182,212,.05)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+        style={{ border: '1px solid rgba(6,182,212,.05)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%', zIndex: 1 }}
         animate={{ rotate: -360 }} transition={{ duration: 38, repeat: Infinity, ease: 'linear' }} />
       <motion.div className="absolute w-[340px] h-[340px] rounded-full pointer-events-none"
-        style={{ border: '1px solid rgba(245,158,11,.04)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%' }}
+        style={{ border: '1px solid rgba(245,158,11,.05)', top: '50%', left: '50%', translateX: '-50%', translateY: '-50%', zIndex: 1 }}
         animate={{ rotate: 360 }} transition={{ duration: 24, repeat: Infinity, ease: 'linear' }} />
 
       {/* Floating tech badges — desktop only */}
       {TECH_FLOAT.map((b) => (
         <motion.div key={b.text}
           className={`absolute hidden xl:flex items-center font-mono text-[10px] tracking-[.15em] px-3 py-1.5 rounded-full pointer-events-none ${b.cls}`}
-          style={{ background: `${b.color}12`, border: `1px solid ${b.color}28`, color: b.color }}
+          style={{ background: `${b.color}12`, border: `1px solid ${b.color}28`, color: b.color, zIndex: 5 }}
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1, y: [0, -12, 0] }}
           transition={{
@@ -247,17 +283,28 @@ export default function Hero() {
         </motion.div>
       ))}
 
-      {/* ── Main Content ── */}
+      {/* ── Main content — glass halo behind ── */}
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto flex flex-col items-center">
 
-        {/* Badge */}
+        {/* Content glow halo */}
+        <div className="hero-halo" style={{
+          width: 600, height: 600,
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(99,102,241,.06) 0%, rgba(6,182,212,.03) 50%, transparent 70%)',
+        }} />
+
+        {/* Availability badge — premium */}
         <motion.div
           initial={{ opacity: 0, y: -20, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 4.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-8">
-          <span className="tech-tag text-[10px] inline-flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          className="mb-8 relative">
+          <span className="tech-tag text-[10px] inline-flex items-center gap-2 relative">
+            <span className="relative w-2 h-2 flex items-center justify-center">
+              <span className="ping-ring" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 relative z-10" />
+            </span>
             Available for Web &amp; Enterprise Projects
           </span>
         </motion.div>
@@ -266,7 +313,6 @@ export default function Hero() {
         <div style={{ perspective: '900px' }} className="mb-5">
           <motion.div style={{ rotateX: rotX, rotateY: rotY }}>
 
-            {/* Muzammal — staggered letters */}
             <motion.div
               className="flex justify-center font-serif font-bold text-cream overflow-hidden"
               style={{ fontSize: 'clamp(3.8rem, 11vw, 8rem)', letterSpacing: '-.04em', perspective: '600px' }}
@@ -280,7 +326,6 @@ export default function Hero() {
               ))}
             </motion.div>
 
-            {/* Tariq — gradient, continued stagger */}
             <motion.div
               className="flex justify-center font-serif font-bold overflow-hidden"
               style={{ fontSize: 'clamp(3.8rem, 11vw, 8rem)', letterSpacing: '-.04em', perspective: '600px' }}
@@ -297,7 +342,7 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Animated role — scramble effect */}
+        {/* Animated role */}
         <motion.div
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 5.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -309,7 +354,6 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        {/* Gradient divider — scales in from center */}
         <motion.div
           initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 1 }}
           transition={{ delay: 5.2, duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
@@ -325,14 +369,14 @@ export default function Hero() {
           precision, performance, and scale.
         </motion.p>
 
-        {/* Stats with counter animation */}
+        {/* Stats */}
         <motion.div
           initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 5.4, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="flex items-center gap-8 sm:gap-14 mb-12 flex-wrap justify-center">
           {STATS.map((s, i) => (
-            <div key={s.label} className="flex flex-col items-center gap-1">
-              <span className="font-orb text-2xl sm:text-3xl font-bold text-grad">
+            <div key={s.label} className="flex flex-col items-center gap-1 group">
+              <span className="font-orb text-2xl sm:text-3xl font-bold text-grad transition-all duration-300 group-hover:drop-shadow-[0_0_12px_rgba(99,102,241,.6)]">
                 <Counter to={s.value} suffix={s.suffix} startDelay={(5500 + i * 150)} />
               </span>
               <span className="font-sans text-[10px] tracking-[.2em] uppercase text-slate/55">{s.label}</span>
@@ -340,7 +384,7 @@ export default function Hero() {
           ))}
         </motion.div>
 
-        {/* CTA — magnetic buttons */}
+        {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 5.5, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
@@ -352,6 +396,7 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <motion.div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        style={{ zIndex: 10 }}
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 6.8, duration: 1 }}>
         <span className="font-mono text-[9px] tracking-[.4em] uppercase text-indigo/30">Scroll</span>
         <motion.div className="w-[1px] h-10"
