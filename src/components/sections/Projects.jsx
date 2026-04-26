@@ -61,6 +61,7 @@ const projects = [
   },
   {
     id: 9, name: 'Cinematic Portfolio Platform', label: 'Web Application', icon: '🌐', color: '#34d399', year: '2025', status: 'Production',
+    liveUrl: 'https://mz-portfolio-liard.vercel.app',
     desc: 'This portfolio — built with Next.js 16, Framer Motion, GSAP, canvas particle animations, magnetic buttons, 3D tilt cards, laser beams, and bokeh depth effects.',
     tech: ['Next.js 16', 'React 18', 'Framer Motion', 'GSAP', 'Tailwind CSS', 'Canvas API'],
     features: ['Canvas Particle Network', 'Text Scramble Animation', 'Magnetic CTA Buttons', '3D Card Tilt Effects', 'GSAP ScrollTrigger Timeline'],
@@ -200,6 +201,17 @@ function ProjectCard({ p, i, active, setActive }) {
           )}
         </AnimatePresence>
 
+        {p.liveUrl && (
+          <div className="px-6 pb-4 z-10 relative">
+            <a href={p.liveUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[.2em] uppercase px-4 py-1.5 rounded-full transition-all duration-200 hover:scale-105"
+              style={{ background: `${p.color}12`, color: p.color, border: `1px solid ${p.color}30` }}
+              onClick={e => e.stopPropagation()}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: p.color }} />
+              View Live
+            </a>
+          </div>
+        )}
         <div className="absolute bottom-3 right-4 font-mono text-[10px] text-slate/25 z-10">
           {active === p.id ? '▲ less' : '▼ more'}
         </div>

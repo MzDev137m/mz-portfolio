@@ -8,8 +8,16 @@ const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400','700'], variab
 const orbitron  = Orbitron({ subsets: ['latin'], weight: ['400','500','600','700','800'], variable: '--font-orbitron', display: 'swap' })
 
 export const metadata = {
+  metadataBase: new URL('https://mz-portfolio-liard.vercel.app'),
   title: 'Muzammal Tariq — Full-Stack Developer & ERP Engineer',
   description: 'Full-Stack Web Developer and Senior ERP Engineer specializing in React, Next.js, SQL Server, C#, ASP.NET — building modern web applications, business platforms, and enterprise-grade ERP systems.',
+  alternates: { canonical: 'https://mz-portfolio-liard.vercel.app' },
+  openGraph: {
+    url: 'https://mz-portfolio-liard.vercel.app',
+    title: 'Muzammal Tariq — Full-Stack Developer & ERP Engineer',
+    description: 'Full-Stack Web Developer and Senior ERP Engineer specializing in React, Next.js, SQL Server, C#, ASP.NET.',
+    siteName: 'Muzammal Tariq Portfolio',
+  },
 }
 
 export default function RootLayout({ children }) {

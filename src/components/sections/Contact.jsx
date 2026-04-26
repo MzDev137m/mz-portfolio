@@ -6,8 +6,8 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 const contacts = [
   { icon: '📧', label: 'Email', value: 'muzammal.tariq@email.com', href: 'mailto:muzammal.tariq@email.com', color: '#6366f1' },
-  { icon: '💼', label: 'LinkedIn', value: 'linkedin.com/in/muzammal-tariq', href: '#', color: '#0ea5e9' },
-  { icon: '🐙', label: 'GitHub', value: 'github.com/muzammal-tariq', href: '#', color: '#06b6d4' },
+  { icon: '💼', label: 'LinkedIn', value: 'linkedin.com/in/muzammal-tariq', href: 'https://linkedin.com/in/muzammal-tariq', color: '#0ea5e9' },
+  { icon: '🐙', label: 'GitHub', value: 'github.com/MzDev137m', href: 'https://github.com/MzDev137m', color: '#06b6d4' },
   { icon: '📍', label: 'Location', value: 'Lahore, Pakistan', href: null, color: '#f59e0b' },
 ]
 
