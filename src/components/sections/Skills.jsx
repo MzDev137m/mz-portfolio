@@ -3,6 +3,7 @@ import { useRef, useCallback } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
+
 const skills = [
   {
     name: 'SQL Server',      icon: '🗄️', level: 95, color: '#06b6d4',
@@ -92,10 +93,10 @@ function SkillCard({ s, i }) {
       style={{ perspective: '900px' }}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      initial={{ opacity: 0, y: 44 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, rotateY: -90, scale: 0.85 }}
+      whileInView={{ opacity: 1, rotateY: 0, scale: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.65, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}>
+      transition={{ duration: 0.75, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}>
       <motion.div
         style={{ rotateX: srx, rotateY: sry, transformStyle: 'preserve-3d', border: `1px solid ${s.color}18` }}
         className="product-card glass rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden cursor-default group h-full"
@@ -171,13 +172,34 @@ export default function Skills() {
     <Tooltip.Provider>
       <section id="skills" className="section-pad relative overflow-hidden" style={{ background: '#050510' }}>
 
-        {/* Grid bg */}
-        <div className="absolute inset-0 opacity-[.022] pointer-events-none"
+        {/* Rotating conic gradient — unique to Skills section */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center">
+          <motion.div
+            style={{
+              position: 'absolute',
+              width: 800, height: 800,
+              borderRadius: '50%',
+              background: 'conic-gradient(from 0deg, rgba(99,102,241,0.06), rgba(6,182,212,0.05), rgba(245,158,11,0.04), rgba(139,92,246,0.05), rgba(99,102,241,0.06))',
+              filter: 'blur(60px)',
+            }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+          />
+          <motion.div
+            style={{
+              position: 'absolute',
+              width: 400, height: 400,
+              borderRadius: '50%',
+              background: 'conic-gradient(from 180deg, rgba(6,182,212,0.05), rgba(99,102,241,0.06), rgba(6,182,212,0.05))',
+              filter: 'blur(40px)',
+            }}
+            animate={{ rotate: -360 }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+          />
+        </div>
+        {/* Subtle grid */}
+        <div className="absolute inset-0 opacity-[.018] pointer-events-none"
           style={{ backgroundImage: 'linear-gradient(rgba(99,102,241,1) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,1) 1px,transparent 1px)', backgroundSize: '60px 60px' }} />
-
-        {/* Bokeh orbs */}
-        <div className="bokeh-orb absolute" style={{ width: 300, height: 300, top: '10%', right: '5%', background: 'rgba(99,102,241,.05)', '--bdur': '12s', '--bdelay': '0s' }} />
-        <div className="bokeh-orb absolute" style={{ width: 200, height: 200, bottom: '10%', left: '3%', background: 'rgba(6,182,212,.04)', '--bdur': '9s', '--bdelay': '3s' }} />
 
         <div className="max-w-7xl mx-auto">
           {/* Heading */}

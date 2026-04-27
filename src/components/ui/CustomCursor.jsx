@@ -1,88 +1,145 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { useEffect, useRef } from 'react'
 
-export default function CustomCursor() {
-  const [hovering, setHovering] = useState(false)
-  const [clicking, setClicking] = useState(false)
-  const [visible,  setVisible]  = useState(false)
+// Tube color stops — tail (cyan) → mid (violet) → head (hot pink)
+const C0 = [0,   210, 200]
+const C1 = [140, 0,   255]
+const C2 = [255, 20,  160]
 
-  const mouseX = useMotionValue(-200)
-  const mouseY = useMotionValue(-200)
+function lerp(a, b, t) { return a + (b - a) * t }
+function lerpRgb(a, b, t) {
+  return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]
+}
 
-  const ringX = useSpring(mouseX, { stiffness: 160, damping: 20, mass: 0.5 })
-  const ringY = useSpring(mouseY, { stiffness: 160, damping: 20, mass: 0.5 })
+export default function TubesCursor() {
+  const canvasRef = useRef(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (!window.matchMedia('(pointer: fine)').matches) return
+    if (window.matchMedia('(pointer: coarse)').matches) return
 
-    const onMove = (e) => {
-      mouseX.set(e.clientX)
-      mouseY.set(e.clientY)
-      if (!visible) setVisible(true)
-    }
-    const onDown = () => setClicking(true)
-    const onUp   = () => setClicking(false)
-    const onOver = (e) => {
-      if (e.target.closest('a,button,[role="button"],input,textarea,select,label')) setHovering(true)
-    }
-    const onOut = () => setHovering(false)
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
 
+    let trail = []   // { x, y, ts }
+    let rafId
+    const TRAIL_LEN  = 90
+    const TRAIL_LIFE = 680  // ms
+
+    const resize = () => {
+      canvas.width  = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
+
+    const onMove = e => {
+      trail.push({ x: e.clientX, y: e.clientY, ts: performance.now() })
+      if (trail.length > TRAIL_LEN) trail.shift()
+    }
     window.addEventListener('mousemove', onMove)
-    window.addEventListener('mousedown', onDown)
-    window.addEventListener('mouseup',   onUp)
-    document.addEventListener('mouseover', onOver)
-    document.addEventListener('mouseout',  onOut)
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mousedown', onDown)
-      window.removeEventListener('mouseup',   onUp)
-      document.removeEventListener('mouseover', onOver)
-      document.removeEventListener('mouseout',  onOut)
+
+    // Smooth bezier path through trail points
+    const buildPath = pts => {
+      ctx.beginPath()
+      ctx.moveTo(pts[0].x, pts[0].y)
+      for (let i = 1; i < pts.length - 1; i++) {
+        const mx = (pts[i].x + pts[i + 1].x) / 2
+        const my = (pts[i].y + pts[i + 1].y) / 2
+        ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my)
+      }
+      const last = pts[pts.length - 1]
+      ctx.lineTo(last.x, last.y)
     }
-  }, [mouseX, mouseY, visible])
+
+    const render = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      const now = performance.now()
+      trail = trail.filter(p => now - p.ts < TRAIL_LIFE)
+
+      if (trail.length >= 3) {
+        const f = trail[0], l = trail[trail.length - 1]
+
+        const makeGrad = (stops) => {
+          const g = ctx.createLinearGradient(f.x, f.y, l.x, l.y)
+          stops.forEach(([pos, r, g2, b, a]) => g.addColorStop(pos, `rgba(${r},${g2},${b},${a})`))
+          return g
+        }
+
+        ctx.lineCap  = 'round'
+        ctx.lineJoin = 'round'
+
+        // ── Outer halo ──────────────────────────────────────────
+        ctx.save()
+        ctx.strokeStyle = makeGrad([
+          [0,    ...C0, 0],
+          [0.2,  ...C0, 0.10],
+          [0.55, ...C1, 0.13],
+          [1,    ...C2, 0.16],
+        ])
+        ctx.lineWidth   = 34
+        ctx.shadowBlur  = 55
+        ctx.shadowColor = `rgba(${C2.join(',')},0.4)`
+        buildPath(trail); ctx.stroke()
+        ctx.restore()
+
+        // ── Mid glow ───────────────────────────────────────────
+        ctx.save()
+        ctx.strokeStyle = makeGrad([
+          [0,    ...C0, 0],
+          [0.15, ...C0, 0.38],
+          [0.5,  ...C1, 0.55],
+          [1,    ...C2, 0.70],
+        ])
+        ctx.lineWidth   = 13
+        ctx.shadowBlur  = 24
+        ctx.shadowColor = `rgba(${C1.join(',')},0.8)`
+        buildPath(trail); ctx.stroke()
+        ctx.restore()
+
+        // ── Bright core ─────────────────────────────────────────
+        ctx.save()
+        ctx.strokeStyle = makeGrad([
+          [0,    ...C0, 0],
+          [0.08, ...C0, 0.75],
+          [0.5,  ...C1, 0.92],
+          [1,    ...C2, 1],
+        ])
+        ctx.lineWidth   = 3
+        ctx.shadowBlur  = 12
+        ctx.shadowColor = `rgba(${C2.join(',')},1)`
+        buildPath(trail); ctx.stroke()
+        ctx.restore()
+
+        // ── Tip dot ─────────────────────────────────────────────
+        ctx.save()
+        ctx.shadowBlur  = 22
+        ctx.shadowColor = `rgba(${C2.join(',')},1)`
+        ctx.fillStyle   = 'rgba(255,210,245,0.95)'
+        ctx.beginPath()
+        ctx.arc(l.x, l.y, 3.5, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+      }
+
+      rafId = requestAnimationFrame(render)
+    }
+    render()
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('resize', resize)
+    }
+  }, [])
 
   return (
-    <>
-      {/* Outer spring-lagged ring */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[99998] rounded-full"
-        style={{
-          x: ringX,
-          y: ringY,
-          translateX: '-50%',
-          translateY: '-50%',
-          border: '1.5px solid rgba(99,102,241,.55)',
-          mixBlendMode: 'difference',
-          opacity: visible ? 1 : 0,
-        }}
-        animate={{
-          width:       clicking ? 22 : hovering ? 50 : 36,
-          height:      clicking ? 22 : hovering ? 50 : 36,
-          borderColor: hovering ? 'rgba(6,182,212,.8)' : 'rgba(99,102,241,.55)',
-        }}
-        transition={{ duration: 0.22, ease: 'easeOut' }}
-      />
-
-      {/* Inner dot */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[99999] rounded-full"
-        style={{
-          x: mouseX,
-          y: mouseY,
-          translateX: '-50%',
-          translateY: '-50%',
-          opacity: visible ? 1 : 0,
-        }}
-        animate={{
-          width:      clicking ? 4  : hovering ? 10 : 7,
-          height:     clicking ? 4  : hovering ? 10 : 7,
-          background: hovering ? '#06b6d4' : '#6366f1',
-          boxShadow:  hovering ? '0 0 14px rgba(6,182,212,.9)' : '0 0 10px rgba(99,102,241,.8)',
-        }}
-        transition={{ duration: 0.15, ease: 'easeOut' }}
-      />
-    </>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 9999, mixBlendMode: 'screen' }}
+    />
   )
 }

@@ -8,7 +8,7 @@ const facts = [
   { Icon: Layers,         label: 'Specialization', value: 'ERP & Web Development',    color: '#6366f1' },
   { Icon: Building2,      label: 'Domain',          value: 'Enterprise & Web Software', color: '#06b6d4' },
   { Icon: MapPin,         label: 'Location',         value: 'Lahore, Pakistan',          color: '#f59e0b' },
-  { Icon: GraduationCap,  label: 'Education',        value: 'BS CS — GCUF Faisalabad',    color: '#8b5cf6' },
+  { Icon: GraduationCap,  label: 'Education',        value: 'BS Computer Science',        color: '#8b5cf6' },
   { Icon: Briefcase,      label: 'Experience',       value: '5+ Years Professional',      color: '#10b981' },
   { Icon: Zap,            label: 'Focus',            value: 'Full-Stack & Performance',   color: '#ec4899' },
 ]
@@ -58,9 +58,24 @@ export default function About() {
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(6,182,212,.04) 0%, transparent 70%)' }} />
 
-      {/* Subtle grid */}
-      <div className="absolute inset-0 pointer-events-none opacity-[.012]"
-        style={{ backgroundImage: 'linear-gradient(rgba(6,182,212,1) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,1) 1px,transparent 1px)', backgroundSize: '60px 60px' }} />
+      {/* Animated diagonal light beams — unique to About section */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[0, 1, 2, 3].map(i => (
+          <motion.div key={i}
+            className="absolute pointer-events-none"
+            style={{
+              top: `${15 + i * 21}%`,
+              left: 0, right: 0,
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent 0%, rgba(6,182,212,0.18) 40%, rgba(99,102,241,0.14) 60%, transparent 100%)',
+              rotate: -8,
+              transformOrigin: 'left center',
+            }}
+            animate={{ x: ['-110%', '110%'] }}
+            transition={{ duration: 9 + i * 2.5, repeat: Infinity, delay: i * 1.8, ease: 'linear' }}
+          />
+        ))}
+      </div>
 
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">

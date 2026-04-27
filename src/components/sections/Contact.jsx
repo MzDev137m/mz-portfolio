@@ -2,12 +2,20 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 
+function WhatsappIcon({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+    </svg>
+  )
+}
+
 const contacts = [
-  { icon: '📧', label: 'Email',     value: 'm.muzammal.dev@gmail.com',       href: 'mailto:m.muzammal.dev@gmail.com',                                     color: '#6366f1' },
-  { icon: '💬', label: 'WhatsApp', value: '+92 300 4783996',                  href: 'https://wa.me/923004783996?text=Hi%20Muzammal!%20I%20found%20your%20portfolio.', color: '#25D366' },
-  { icon: '💼', label: 'LinkedIn', value: 'linkedin.com/in/muzammal-tariq',  href: 'https://linkedin.com/in/muzammal-tariq',                              color: '#0ea5e9' },
-  { icon: '🐙', label: 'GitHub',   value: 'github.com/MzDev137m',            href: 'https://github.com/MzDev137m',                                        color: '#06b6d4' },
-  { icon: '📍', label: 'Location', value: 'Lahore, Pakistan',                 href: null,                                                                  color: '#f59e0b' },
+  { icon: '📧',           label: 'Email',     value: 'm.muzammal.dev@gmail.com',       href: 'mailto:m.muzammal.dev@gmail.com',                                          color: '#6366f1' },
+  { Icon: WhatsappIcon,   label: 'WhatsApp',  value: '+92 300 4783996',                href: 'https://wa.me/923004783996?text=Hi%20Muzammal!%20I%20found%20your%20portfolio.', color: '#25D366' },
+  { icon: '💼',           label: 'LinkedIn',  value: 'linkedin.com/in/muzammal-tariq', href: 'https://linkedin.com/in/muzammal-tariq',                                   color: '#0ea5e9' },
+  { icon: '🐙',           label: 'GitHub',    value: 'github.com/MzDev137m',           href: 'https://github.com/MzDev137m',                                             color: '#06b6d4' },
+  { icon: '📍',           label: 'Location',  value: 'Lahore, Pakistan',                href: null,                                                                       color: '#f59e0b' },
 ]
 
 const projectTypes = [
@@ -20,11 +28,12 @@ const projectTypes = [
   'Other',
 ]
 
+// Contact: slide in from right — distinct from other sections
 const v = (delay = 0) => ({
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
+  initial: { opacity: 0, x: 55 },
+  whileInView: { opacity: 1, x: 0 },
   viewport: { once: true },
-  transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] },
+  transition: { duration: 0.72, delay, ease: [0.16, 1, 0.3, 1] },
 })
 
 export default function Contact() {
@@ -52,6 +61,18 @@ export default function Contact() {
       {/* Ambient glow */}
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 100%, rgba(99,102,241,.06) 0%, transparent 70%)' }} />
+
+      {/* Ripple rings — unique to Contact section */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+        {[0, 1, 2, 3, 4].map(i => (
+          <motion.div key={i}
+            className="absolute rounded-full"
+            style={{ border: '1px solid rgba(99,102,241,0.10)' }}
+            animate={{ width: [80, 1000], height: [80, 1000], opacity: [0.25, 0] }}
+            transition={{ duration: 6, repeat: Infinity, delay: i * 1.2, ease: 'easeOut' }}
+          />
+        ))}
+      </div>
 
       <div className="max-w-6xl mx-auto">
 
@@ -93,8 +114,8 @@ export default function Contact() {
                     className="glass rounded-2xl p-5 flex items-center gap-4 group transition-all duration-300 hover:scale-[1.01]"
                     style={{ border: `1px solid ${c.color}18`, textDecoration: 'none' }}>
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                      style={{ background: `${c.color}12`, border: `1px solid ${c.color}25` }}>
-                      {c.icon}
+                      style={{ background: `${c.color}12`, border: `1px solid ${c.color}25`, color: c.color }}>
+                      {c.Icon ? <c.Icon size={20} /> : c.icon}
                     </div>
                     <div>
                       <div className="font-mono text-[9px] tracking-[.3em] uppercase mb-0.5" style={{ color: `${c.color}99` }}>{c.label}</div>
@@ -106,8 +127,8 @@ export default function Contact() {
                   <div className="glass rounded-2xl p-5 flex items-center gap-4"
                     style={{ border: `1px solid ${c.color}18` }}>
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                      style={{ background: `${c.color}12`, border: `1px solid ${c.color}25` }}>
-                      {c.icon}
+                      style={{ background: `${c.color}12`, border: `1px solid ${c.color}25`, color: c.color }}>
+                      {c.Icon ? <c.Icon size={20} /> : c.icon}
                     </div>
                     <div>
                       <div className="font-mono text-[9px] tracking-[.3em] uppercase mb-0.5" style={{ color: `${c.color}99` }}>{c.label}</div>

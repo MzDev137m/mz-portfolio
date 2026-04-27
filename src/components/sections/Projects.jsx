@@ -215,10 +215,10 @@ function ProjectCard({ p, i, onOpenDialog }) {
       style={{ perspective: '1000px' }}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      initial={{ opacity: 0, y: 44 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.78, filter: 'blur(8px)' }}
+      whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
       viewport={{ once: true }}
-      transition={{ duration: 0.65, delay: (i % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}>
+      transition={{ duration: 0.7, delay: (i % 3) * 0.11, ease: [0.16, 1, 0.3, 1] }}>
       <motion.div
         style={{ rotateX: srx, rotateY: sry, transformStyle: 'preserve-3d' }}
         className="product-card glass rounded-2xl overflow-hidden group relative"
@@ -315,8 +315,26 @@ export default function Projects() {
 
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(99,102,241,.04) 0%, transparent 70%)' }} />
-      <div className="bokeh-orb absolute" style={{ width: 280, height: 280, top: '5%', left: '8%', background: 'rgba(99,102,241,.06)', '--bdur': '11s', '--bdelay': '1s' }} />
-      <div className="bokeh-orb absolute" style={{ width: 220, height: 220, bottom: '8%', right: '6%', background: 'rgba(6,182,212,.05)', '--bdur': '13s', '--bdelay': '4s' }} />
+
+      {/* Pulsing dot matrix — unique to Projects section */}
+      <motion.div className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(circle 1.5px at 1px 1px, rgba(99,102,241,0.9) 0%, transparent 0%)',
+          backgroundSize: '48px 48px',
+        }}
+        animate={{ opacity: [0.04, 0.10, 0.04] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      {/* Secondary offset dots */}
+      <motion.div className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(circle 1px at 1px 1px, rgba(6,182,212,0.9) 0%, transparent 0%)',
+          backgroundSize: '48px 48px',
+          backgroundPosition: '24px 24px',
+        }}
+        animate={{ opacity: [0.02, 0.06, 0.02] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+      />
 
       <div className="max-w-7xl mx-auto">
         {/* Heading */}
