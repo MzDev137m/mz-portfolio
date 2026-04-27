@@ -1,14 +1,13 @@
 'use client'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { db } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 const contacts = [
-  { icon: '📧', label: 'Email', value: 'muzammal.tariq@email.com', href: 'mailto:muzammal.tariq@email.com', color: '#6366f1' },
-  { icon: '💼', label: 'LinkedIn', value: 'linkedin.com/in/muzammal-tariq', href: 'https://linkedin.com/in/muzammal-tariq', color: '#0ea5e9' },
-  { icon: '🐙', label: 'GitHub', value: 'github.com/MzDev137m', href: 'https://github.com/MzDev137m', color: '#06b6d4' },
-  { icon: '📍', label: 'Location', value: 'Lahore, Pakistan', href: null, color: '#f59e0b' },
+  { icon: '📧', label: 'Email',     value: 'm.muzammal.dev@gmail.com',       href: 'mailto:m.muzammal.dev@gmail.com',                                     color: '#6366f1' },
+  { icon: '💬', label: 'WhatsApp', value: '+92 300 4783996',                  href: 'https://wa.me/923004783996?text=Hi%20Muzammal!%20I%20found%20your%20portfolio.', color: '#25D366' },
+  { icon: '💼', label: 'LinkedIn', value: 'linkedin.com/in/muzammal-tariq',  href: 'https://linkedin.com/in/muzammal-tariq',                              color: '#0ea5e9' },
+  { icon: '🐙', label: 'GitHub',   value: 'github.com/MzDev137m',            href: 'https://github.com/MzDev137m',                                        color: '#06b6d4' },
+  { icon: '📍', label: 'Location', value: 'Lahore, Pakistan',                 href: null,                                                                  color: '#f59e0b' },
 ]
 
 const projectTypes = [
@@ -37,17 +36,11 @@ export default function Contact() {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }))
   }
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault()
     setSending(true)
-    try {
-      await addDoc(collection(db, 'portfolio_contacts'), {
-        ...form,
-        timestamp: serverTimestamp(),
-      })
-    } catch (err) {
-      console.error('Contact form error:', err)
-    }
+    const msg = `*New Portfolio Inquiry*\n\n*Name:* ${form.name}\n*Email:* ${form.email}\n*Project:* ${form.type || 'Not specified'}\n\n*Message:*\n${form.message}`
+    window.open(`https://wa.me/923004783996?text=${encodeURIComponent(msg)}`, '_blank')
     setSending(false)
     setSent(true)
   }
@@ -148,7 +141,7 @@ export default function Contact() {
                 <div className="text-5xl">✅</div>
                 <h3 className="font-serif font-bold text-cream text-xl">Message Sent!</h3>
                 <p className="font-sans text-slate/60 text-sm">
-                  Thanks for reaching out. I&apos;ll get back to you within 24 hours.
+                  Your message was opened in WhatsApp. I&apos;ll respond within 24 hours.
                 </p>
                 <button
                   onClick={() => { setSent(false); setForm({ name: '', email: '', type: '', message: '' }) }}

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Layers, Building2, MapPin, GraduationCap, Briefcase, Zap } from 'lucide-react'
+import ProfileModal from '@/components/ui/ProfileModal'
 
 const facts = [
   { Icon: Layers,         label: 'Specialization', value: 'ERP & Web Development',    color: '#6366f1' },
@@ -20,14 +21,15 @@ const slideLeft  = { hidden: { opacity: 0, x: -60 }, visible: { opacity: 1, x: 0
 const slideRight = { hidden: { opacity: 0, x:  60 }, visible: { opacity: 1, x: 0 } }
 const tr = (delay = 0) => ({ duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] })
 
-function ProfileAvatar({ size = 72 }) {
+function ProfileAvatar({ size = 72, onClick }) {
   const [imgOk, setImgOk] = useState(true)
   return (
-    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+    <div className="relative flex-shrink-0 cursor-pointer group" style={{ width: size, height: size }}
+      onClick={onClick} title="View Profile">
       <div className="absolute inset-0 rounded-full border-spin" style={{ padding: 2 }} />
       <div className="absolute inset-0 rounded-full pointer-events-none"
         style={{ boxShadow: '0 0 24px rgba(99,102,241,.5), 0 0 48px rgba(6,182,212,.2)' }} />
-      <div className="absolute inset-[3px] rounded-full overflow-hidden"
+      <div className="absolute inset-[3px] rounded-full overflow-hidden transition-transform duration-300 group-hover:scale-105"
         style={{ background: 'rgba(10,10,30,.95)' }}>
         {imgOk ? (
           <img src="https://github.com/MzDev137m.png" alt="Muzammal Tariq"
@@ -39,11 +41,16 @@ function ProfileAvatar({ size = 72 }) {
           </div>
         )}
       </div>
+      <div className="absolute inset-[3px] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        style={{ background: 'rgba(99,102,241,.2)' }}>
+        <span className="font-mono text-[7px] tracking-[.1em] text-cream/90">VIEW</span>
+      </div>
     </div>
   )
 }
 
 export default function About() {
+  const [profileOpen, setProfileOpen] = useState(false)
   return (
     <section id="about" className="section-pad relative overflow-hidden"
       style={{ background: 'linear-gradient(180deg, #050510 0%, #080818 50%, #050510 100%)' }}>
@@ -117,7 +124,7 @@ export default function About() {
                 style={{ background: 'radial-gradient(circle, rgba(99,102,241,.12) 0%, transparent 70%)', transform: 'translate(30%,-30%)' }} />
 
               <div className="flex items-center gap-5 mb-6">
-                <ProfileAvatar size={72} />
+                <ProfileAvatar size={72} onClick={() => setProfileOpen(true)} />
                 <div>
                   <div className="font-serif font-bold text-cream text-xl">Muzammal Tariq</div>
                   <div className="font-mono text-[10px] tracking-[.2em] uppercase text-indigo/60 mt-1">ERP Engineer &amp; Web Developer</div>
@@ -180,6 +187,8 @@ export default function About() {
 
         </div>
       </div>
+
+      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
     </section>
   )
 }
