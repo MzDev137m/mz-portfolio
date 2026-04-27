@@ -8,7 +8,7 @@ const facts = [
   { Icon: Layers,         label: 'Specialization', value: 'ERP & Web Development',    color: '#6366f1' },
   { Icon: Building2,      label: 'Domain',          value: 'Enterprise & Web Software', color: '#06b6d4' },
   { Icon: MapPin,         label: 'Location',         value: 'Lahore, Pakistan',          color: '#f59e0b' },
-  { Icon: GraduationCap,  label: 'Education',        value: 'BS Computer Science',        color: '#8b5cf6' },
+  { Icon: GraduationCap,  label: 'Education',        value: 'BS CS — GCUF Faisalabad',    color: '#8b5cf6' },
   { Icon: Briefcase,      label: 'Experience',       value: '5+ Years Professional',      color: '#10b981' },
   { Icon: Zap,            label: 'Focus',            value: 'Full-Stack & Performance',   color: '#ec4899' },
 ]
@@ -90,18 +90,27 @@ export default function About() {
             <motion.p className="font-sans text-slate leading-relaxed text-base mb-5"
               variants={slideLeft} initial="hidden" whileInView="visible"
               viewport={{ once: true }} transition={tr(0.18)}>
-              I am a passionate Full-Stack Developer and ERP Software Engineer with deep expertise in
-              designing, building, and deploying enterprise resource planning systems and modern web
-              applications. From HR and Finance ERP modules to business websites, admin dashboards,
-              and responsive web platforms — I build systems that last.
+              Full-Stack .NET Developer &amp; ERP Engineer with 4+ years building and optimizing enterprise
+              resource planning systems using ASP.NET Core, C#, and SQL Server. Specialized in performance
+              tuning, workflow automation, and scalable ERP architecture across <span className="text-cyan/80">Finance</span>,{' '}
+              <span className="text-indigo/80">HR</span>, <span className="text-amber-400/80">Production</span>,
+              and <span className="text-emerald-400/80">Inventory</span> domains.
             </motion.p>
 
-            <motion.p className="font-sans text-slate/70 leading-relaxed text-sm mb-8"
+            <motion.p className="font-sans text-slate/70 leading-relaxed text-sm mb-5"
               variants={slideLeft} initial="hidden" whileInView="visible"
               viewport={{ once: true }} transition={tr(0.22)}>
-              My stack spans both worlds: SQL Server performance engineering on the backend, and
-              React, Next.js, and Tailwind CSS on the frontend — delivering full-stack enterprise
-              solutions, interactive web experiences, and pixel-perfect UI implementations.
+              Proven track record — 80% system performance improvements, query execution reduced from 45s to
+              under 10s, 99%+ uptime in live production. Built 10+ ERP modules serving 200+ daily users,
+              centralized reporting systems, RBAC document management, and event-driven approval workflows
+              that cut decision time by 50%.
+            </motion.p>
+
+            <motion.p className="font-sans text-slate/60 leading-relaxed text-sm mb-8"
+              variants={slideLeft} initial="hidden" whileInView="visible"
+              viewport={{ once: true }} transition={tr(0.25)}>
+              On the web side: React, Next.js, and Tailwind CSS — delivering full-stack enterprise portals,
+              interactive dashboards, and pixel-perfect UI using Clean Architecture and Agile/Scrum practices.
             </motion.p>
 
             <motion.div className="flex flex-wrap gap-2"

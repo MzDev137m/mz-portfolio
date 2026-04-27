@@ -62,7 +62,14 @@ const projects = [
     metrics: [{ label: 'Widgets', value: '40+' }, { label: 'Templates', value: '60+' }, { label: 'Daily Reports', value: '15' }],
   },
   {
-    id: 9, name: 'Cinematic Portfolio Platform', label: 'Web Application', icon: '🌐', color: '#34d399', year: '2025', status: 'Production',
+    id: 9, name: 'Real Estate Management System', label: 'Web Application', icon: '🏢', color: '#0ea5e9', year: '2023', status: 'Production',
+    desc: 'Scalable multi-module property and services management system with RBAC-based access control — covering property listings, tenant management, service requests, and secure document workflows with role-based admin portals.',
+    tech: ['ASP.NET', 'SQL Server', 'RBAC', 'HTML', 'CSS', 'Bootstrap'],
+    features: ['RBAC-based Access Control', 'Multi-module Property Management', 'Tenant & Service Request Tracking', 'Secure Document Workflows', 'Role-based Admin Panel'],
+    metrics: [{ label: 'Modules', value: '5+' }, { label: 'User Roles', value: '4' }, { label: 'Security', value: 'RBAC' }],
+  },
+  {
+    id: 10, name: 'Cinematic Portfolio Platform', label: 'Web Application', icon: '🌐', color: '#34d399', year: '2025', status: 'Production',
     liveUrl: 'https://mz-portfolio-liard.vercel.app',
     desc: 'This portfolio — built with Next.js 16, Framer Motion, GSAP, canvas particle animations, magnetic buttons, 3D tilt cards, laser beams, and bokeh depth effects.',
     tech: ['Next.js 16', 'React 18', 'Framer Motion', 'GSAP', 'Tailwind CSS', 'Canvas API'],

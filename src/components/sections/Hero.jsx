@@ -479,8 +479,9 @@ export default function Hero() {
           <motion.p className="font-sans text-slate/70 text-[15px] leading-relaxed max-w-xl mb-8"
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 5.1, duration: 0.8 }}>
-            Senior ERP Engineer &amp; Full-Stack Developer with 5+ years delivering enterprise-grade systems —
-            from high-performance SQL Server databases to modern Next.js web applications and complete ERP platforms.
+            Full-Stack .NET Developer &amp; ERP Engineer with 4+ years building scalable enterprise systems —
+            ASP.NET Core, C#, SQL Server across Finance, HR, Production &amp; Inventory domains.
+            Proven <span className="text-cyan/90 font-medium">80% performance gains</span> and <span className="text-indigo/90 font-medium">99%+ production uptime</span>.
           </motion.p>
 
           {/* Stats */}
